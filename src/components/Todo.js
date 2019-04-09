@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const todo = props =>{
     const [todoName, setTodoName] = useState('');
-    const [submittedTodo,setSubmittedTodo] = useState(null);
+    // const [submittedTodo,setSubmittedTodo] = useState(null);
     // const [todoList, setTodoList] = useState([]);
 
     const todoListReducer = (state,action) => {
@@ -43,13 +43,13 @@ const todo = props =>{
 
   const [todoList, dispatch] = useReducer(todoListReducer, []);
 
-    useEffect(() => {
-        if (submittedTodo) {
-        dispatch({type : 'ADD', payload: submittedTodo })
-        }
-        },
-        [submittedTodo]
-    );
+    // useEffect(() => {
+    //     if (submittedTodo) {
+    //     dispatch({type : 'ADD', payload: submittedTodo })
+    //     }
+    //     },
+    //     [submittedTodo]
+    // );
 
     const  inputChangeHandler = event => {
         setTodoName(event.target.value);
@@ -60,13 +60,24 @@ const todo = props =>{
         axios.post('https://test-443ce.firebaseio.com/todos.json',{name: todoName})
                 .then(res => {
                     const todoItem = {id: res.data.name, name: todoName};
-                    setSubmittedTodo(todoItem);
+                    // setSubmittedTodo(todoItem);
                     // setTodoList(todoList.concat(todoItem));
+                    dispatch({type: 'ADD' , payload: todoItem})
                 console.log(res)
             })
             .catch ( err => {
                 console.log(err.res);
             })
+    };
+
+    const todoRemoveHandler = todoId => {
+
+
+        axios.delete(`https://test-443ce.firebaseio.com/todos/${todoId}.json`)
+            .then(res => {
+                dispatch({type: 'REMOVE', payload: todoId});
+            })
+                .catch(err => console.log(err));
     };
 
     return <React.Fragment>
@@ -78,7 +89,8 @@ const todo = props =>{
         <button type="button" onClick={todoAddHandler} >Add </button>
             <ul>
             {todoList.map((todo) => (
-                <li key={todo.id}>
+                <li key={todo.id} onClick={todoRemoveHandler.bind(this, todo.id)}>
+                    {/*bind to pass the argument*/}
                     {todo.name}
                 </li>
                 ))}
