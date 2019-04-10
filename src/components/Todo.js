@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useReducer, useRef } from 'react';
+import React, { useState, useEffect, useReducer, useRef, useMemo } from 'react';
 import axios from 'axios';
 import List from './List'
 
 const todo = props =>{
+
+    const [inputIsValid,setInputIsValid] = useState(true);
     // const [todoName, setTodoName] = useState('');
     // const [submittedTodo,setSubmittedTodo] = useState(null);
     // const [todoList, setTodoList] = useState([]);
@@ -43,7 +45,14 @@ const todo = props =>{
         }, []
     );
 
+    const inputValidationHandler = event => {
 
+        if (event.target.value.trim()=== '' )
+        { setInputIsValid(false); }
+        else {
+            setInputIsValid(true)
+        }
+    };
 
   const [todoList, dispatch] = useReducer(todoListReducer, []);
 
@@ -85,18 +94,26 @@ const todo = props =>{
                 .catch(err => console.log(err));
     };
 
-    return <React.Fragment>
+    return (<React.Fragment>
         <input
             type="text"
             placeholder="Todo"
             ref={todoInputRef}
             // onChange={inputChangeHandler}
             // value={todoName}
+            onChange={inputValidationHandler}
+            style = {{backgroundColor: inputIsValid ? 'transparent' : 'red' }}
         />
         <button type="button" onClick={todoAddHandler} >Add </button>
-          <List items={todoList} onclick={todoRemoveHandler}/>
+        {useMemo(() => ( <List items={todoList} onclick={todoRemoveHandler}/> )
+            , [todoList] )}
+       {/*optimize performance *****
+        don't generate the list again if it's not changed and then we use the one cached
+        , the second argument [todoList] indicate that we need to update the list rendering
+        whenever we changed something*/}
 
-    </React.Fragment>;
+    </React.Fragment>
+);
 };
 
 export default todo;

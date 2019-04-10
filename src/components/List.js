@@ -1,9 +1,9 @@
-import React  from 'react';
+import React from 'react';
 
 
 const list = props  => {
 
-    console.log('rendering the list')
+    console.log('rendering the list');
 
     return(
         <ul>
