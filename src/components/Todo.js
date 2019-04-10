@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer, useRef, useMemo } from 'react';
 import axios from 'axios';
-import List from './List'
+import List from './List';
+import { useFormInput } from "../hooks/forms";
 
 const todo = props =>{
 
@@ -10,6 +11,7 @@ const todo = props =>{
     // const [todoList, setTodoList] = useState([]);
 
     const todoInputRef = useRef();
+    const todoInput = useFormInput()
 
 
     const todoListReducer = (state,action) => {
@@ -69,9 +71,11 @@ const todo = props =>{
     // };
 
     const todoAddHandler = () => {
-        const todoName = todoInputRef.current.value;
+        // const todoName = todoInputRef.current.value;
+        const todoName = todoInput.value;
 
-        axios.post('https://test-443ce.firebaseio.com/todos.json',{name: todoName})
+
+            axios.post('https://test-443ce.firebaseio.com/todos.json',{name: todoName})
                 .then(res => {
                     const todoItem = {id: res.data.name, name: todoName};
                     // setSubmittedTodo(todoItem);
@@ -98,11 +102,13 @@ const todo = props =>{
         <input
             type="text"
             placeholder="Todo"
-            ref={todoInputRef}
+            // ref={todoInputRef}
             // onChange={inputChangeHandler}
             // value={todoName}
-            onChange={inputValidationHandler}
-            style = {{backgroundColor: inputIsValid ? 'transparent' : 'red' }}
+            // onChange={inputValidationHandler}
+            onChange={todoInput.onChange}
+            value={todoInput.value}
+            style = {{backgroundColor: todoInput.validity  === true ? 'transparent' : 'red' }}
         />
         <button type="button" onClick={todoAddHandler} >Add </button>
         {useMemo(() => ( <List items={todoList} onclick={todoRemoveHandler}/> )
